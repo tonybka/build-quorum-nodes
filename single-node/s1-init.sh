@@ -41,7 +41,6 @@ sudo apt-get install -y software-properties-common
 sudo add-apt-repository -y ppa:ethereum/ethereum
 sudo apt-get update
 sudo apt-get install -y ethereum
-sudo mv /usr/bin/geth /usr/bin/normalGeth
 
 
 # Setup constellation
