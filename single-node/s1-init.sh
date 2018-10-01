@@ -1,4 +1,6 @@
 #!/bin/bash
+set -eu -o pipefail
+
 printx () {
 
     COLOR="96m";
@@ -41,33 +43,36 @@ sudo apt-get update
 sudo apt-get install -y ethereum
 sudo mv /usr/bin/geth /usr/bin/normalGeth
 
+
+# Setup constellation
+CVER="0.3.2"
+CREL="constellation-$CVER-ubuntu1604"
+wget -q https://github.com/jpmorganchase/constellation/releases/download/v$CVER/$CREL.tar.xz
+tar xfJ $CREL.tar.xz
+cp $CREL/constellation-node /usr/local/bin && chmod 0755 /usr/local/bin/constellation-node
+rm -rf $CREL
+
+# install tessera
+wget -q https://github.com/jpmorganchase/tessera/releases/download/tessera-0.6/tessera-app-0.6-app.jar
+mkdir -p /home/vagrant/tessera
+cp ./tessera-app-0.6-app.jar /home/vagrant/tessera/tessera.jar
+echo "TESSERA_JAR=/home/vagrant/tessera/tessera.jar" >> /home/vagrant/.profile
+
+
 # Pull and setup Quorum
 git clone https://github.com/jpmorganchase/quorum.git
 cd quorum/
-git checkout 0905eda48eb07a4ce0e7072c1a2ecbf690ddff77
+pushd quorum >/dev/null
+git checkout tags/v2.1.0
 make all
-echo "PATH=\$PATH:"$PWD/build/bin >> ~/.bashrc
-source ~/.bashrc
-export PATH=$PWD/build/bin:$PATH
-
-# Setup constellation
-cd ..
-mkdir -p constellation && cd constellation/
-sudo apt-get install -y unzip libdb-dev libleveldb-dev libsodium-dev zlib1g-dev libtinfo-dev
-wget https://github.com/jpmorganchase/constellation/releases/download/v0.3.2/constellation-0.3.2-ubuntu1604.tar.xz -O constellation-0.3.2-ubuntu1604.tar.xz
-tar -xf constellation-0.3.2-ubuntu1604.tar.xz
-cp constellation-0.3.2-ubuntu1604/constellation-node /usr/local/bin && chmod 0755 /usr/local/bin/constellation-node
-rm -rf constellation-0.3.2-ubuntu1604.tar.xz constellation-0.3.2-ubuntu1604
-# CVER="0.3.2"
-# CREL="constellation-$CVER-ubuntu1604"
-# wget -q https://github.com/jpmorganchase/constellation/releases/download/v$CVER/$CREL.tar.xz
-# tar xfJ $CREL.tar.xz
-# cp $CREL/constellation-node /usr/local/bin && chmod 0755 /usr/local/bin/constellation-node
-# rm -rf $CREL
+cp build/bin/geth /usr/local/bin
+cp build/bin/bootnode /usr/local/bin
+popd >/dev/null
 
 # Install Porosity
 wget -q https://github.com/jpmorganchase/quorum/releases/download/v1.2.0/porosity
 mv porosity /usr/local/bin && chmod 0755 /usr/local/bin/porosity
+
 
 OLD_GOPATH=$GOPATH
 GOPATH=$PWD/istanbul-tools go get github.com/getamis/istanbul-tools/cmd/istanbul

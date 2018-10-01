@@ -18,7 +18,10 @@ Guide dance to setup Quorum Node
 
 6\. Confirm these ports are opened in the firewall rules
 
-
 ## B. Compatible
 
 1\. constellation-0.3.2-ubuntu1604
+
+## C. Notices
+
+Change ips list on s2-configs.sh before start running your script
