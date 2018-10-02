@@ -22,13 +22,6 @@ export GOROOT=/usr/local/go
 export GOPATH=$HOME/projects/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
-# Install normal Geth
-sudo apt-get install -y software-properties-common
-sudo add-apt-repository -y ppa:ethereum/ethereum
-sudo apt-get update
-sudo apt-get install -y ethereum
-
-
 # Setup constellation
 CREL=constellation-0.2.0-ubuntu1604
 wget -q https://github.com/jpmorganchase/constellation/releases/download/v0.2.0/$CREL.tar.xz
@@ -55,8 +48,6 @@ popd >/dev/null
 # Install Porosity
 wget -q https://github.com/jpmorganchase/quorum/releases/download/v1.2.0/porosity
 mv porosity /usr/local/bin && chmod 0755 /usr/local/bin/porosity
-
-
 
 # Create directories for node's configuration
 cd ~/
