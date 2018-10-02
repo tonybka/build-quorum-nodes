@@ -1,24 +1,10 @@
 #!/bin/bash
 set -eu -o pipefail
 
-printx () {
-
-    COLOR="96m";
-
-    STARTCOLOR="\e[$COLOR";
-    ENDCOLOR="\e[0m";
-
-    printf "\n$STARTCOLOR%s$ENDCOLOR\n" "-------------------------$1-------------------";
-}
-
-sudo apt install sysvbanner
-
-banner            Quorum 
-printf "\n"
-
 # Install dependencies
-sudo apt-get update
-sudo apt-get install -y build-essential libssl-dev git curl
+add-apt-repository ppa:ethereum/ethereum
+apt-get update
+apt-get install -y build-essential unzip libdb-dev libleveldb-dev libsodium-dev zlib1g-dev libtinfo-dev solc sysvbanner wrk
 
 # Install NodeJS
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
@@ -44,9 +30,8 @@ sudo apt-get install -y ethereum
 
 
 # Setup constellation
-CVER="0.3.2"
-CREL="constellation-$CVER-ubuntu1604"
-wget -q https://github.com/jpmorganchase/constellation/releases/download/v$CVER/$CREL.tar.xz
+CREL=constellation-0.2.0-ubuntu1604
+wget -q https://github.com/jpmorganchase/constellation/releases/download/v0.2.0/$CREL.tar.xz
 tar xfJ $CREL.tar.xz
 cp $CREL/constellation-node /usr/local/bin && chmod 0755 /usr/local/bin/constellation-node
 rm -rf $CREL
@@ -72,11 +57,6 @@ wget -q https://github.com/jpmorganchase/quorum/releases/download/v1.2.0/porosit
 mv porosity /usr/local/bin && chmod 0755 /usr/local/bin/porosity
 
 
-OLD_GOPATH=$GOPATH
-GOPATH=$PWD/istanbul-tools go get github.com/getamis/istanbul-tools/cmd/istanbul
-echo "PATH=\$PATH:"$PWD/istanbul-tools/bin >> ~/.bashrc
-export PATH=$PWD/istanbul-tools/bin:$PATH
-GOPATH=$OLD_GOPATH
 
 # Create directories for node's configuration
 cd ~/
@@ -84,3 +64,8 @@ mkdir qdata
 qd =~/qdata
 mkdir -p $qd/{logs,keys}
 mkdir -p $qd/dd/geth
+
+# done!
+banner "Quorum"
+echo
+echo 'Quorum has been installed.'
