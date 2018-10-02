@@ -61,7 +61,7 @@ echo "TESSERA_JAR=/home/vagrant/tessera/tessera.jar" >> /home/vagrant/.profile
 # Pull and setup Quorum
 git clone https://github.com/jpmorganchase/quorum.git
 pushd quorum >/dev/null
-git checkout tags/v2.1.0
+git checkout tags/v2.0.0
 make all
 cp build/bin/geth /usr/local/bin
 cp build/bin/bootnode /usr/local/bin

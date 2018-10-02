@@ -26,4 +26,4 @@ Guide dance to setup Quorum Node
 
 1\. First thing need to do with new server: *sudo apt-get update*
 
-2\. Change ips list on s2-configs.sh before start running your script
+2\. Change ips list, ether account's password on s2-configs.sh before start running your script
