@@ -34,7 +34,7 @@ then
 fi
 
 
-sudo ./cleanup.sh
+sudo bash ./cleanup.sh
 
 uid=`id -u`
 gid=`id -g`
@@ -155,7 +155,7 @@ do
     cp static-nodes.json $qd/dd/static-nodes.json
 
     # Generate Quorum-related keys (used by Constellation)
-    docker run -u $uid:$gid -v $pwd/$qd:/qdata $image bash -c "constellation-node --generatekeys=tm ; constellation-node --generatekeys=tma"
+    docker run -u $uid:$gid -v $pwd/$qd:/qdata $image /bin/bash -c "constellation-node --generatekeys=tm ; constellation-node --generatekeys=tma"
     echo 'Node '$n' public key: '`cat $qd/keys/tm.pub`
 
     cp template/start-node.sh $qd/start-node.sh
