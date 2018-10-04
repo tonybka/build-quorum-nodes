@@ -1,6 +1,7 @@
 FROM ubuntu:16.04 as builder
 
 WORKDIR /work
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN apt-get update && \
     apt-get install -y \
             build-essential \
@@ -41,6 +42,8 @@ RUN git clone https://github.com/jpmorganchase/quorum.git && \
 
 ### multi-stage build
 FROM ubuntu:16.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 # Install add-apt-repository
 RUN apt-get update && \
     apt-get install -y --no-install-recommends software-properties-common && \
