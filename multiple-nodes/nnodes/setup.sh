@@ -4,21 +4,25 @@
 # Create all the necessary scripts, keys, configurations etc. to run
 # a cluster of N Quorum nodes with Raft consensus.
 #
+# The nodes will be in Docker containers. List the IP addresses that
+# they will run at below (arbitrary addresses are fine).
+#
 # Run the cluster with "docker-compose up -d"
 #
 # Run a console on Node N with "geth attach qdata_N/dd/geth.ipc"
 # (assumes Geth is installed on the host.)
 #
-#
 # Geth and Constellation logfiles for Node N will be in qdata_N/logs/
 #
+
 # TODO: check file access permissions, especially for keys.
 
-### Configuration options ##############################################
+
+#### Configuration options #############################################
 
 # One Docker container will be configured for each IP address in $ips
-subnet="172.18.0.0/16"
-ips=("172.18.0.2" "172.18.0.3" "172.18.0.4" "172.18.0.5")
+subnet="172.13.0.0/16"
+ips=("172.13.0.2" "172.13.0.3" "172.13.0.4")
 
 # Docker image name
 image=quorum
@@ -32,16 +36,14 @@ then
     echo "ERROR: There must be more than one node IP address."
     exit 1
 fi
-
-
-sudo bash ./cleanup.sh
+   
+./cleanup.sh
 
 uid=`id -u`
 gid=`id -g`
 pwd=`pwd`
 
-
-### Create directories for each node's configuration #####################
+#### Create directories for each node's configuration ##################
 
 echo '[1] Configuring for '$nnodes' nodes.'
 
@@ -56,7 +58,7 @@ do
 done
 
 
-### Make static-nodes.json and store keys ##############################
+#### Make static-nodes.json and store keys #############################
 
 echo '[2] Creating Enodes and static-nodes.json.'
 
@@ -76,7 +78,6 @@ do
     let n++
 done
 echo "]" >> static-nodes.json
-
 
 
 #### Create accounts, keys and genesis.json file #######################
@@ -124,7 +125,8 @@ cat >> genesis.json <<EOF
 }
 EOF
 
-### Make node list for tm.conf #########################################
+
+#### Make node list for tm.conf ########################################
 
 nodelist=
 n=1
@@ -134,7 +136,6 @@ do
     nodelist=${nodelist}${sep}'"http://'${ip}':9000/"'
     let n++
 done
-
 
 
 #### Complete each node's configuration ################################
@@ -155,7 +156,8 @@ do
     cp static-nodes.json $qd/dd/static-nodes.json
 
     # Generate Quorum-related keys (used by Constellation)
-    docker run -u $uid:$gid -v $pwd/$qd:/qdata $image /bin/bash -c "constellation-node --generatekeys=tm ; constellation-node --generatekeys=tma"
+    docker run -u $uid:$gid -v $pwd/$qd:/qdata $image /bin/bash -c "constellation-node --generatekeys=/qdata/keys/tm < /dev/null > /dev/null"
+    docker run -u $uid:$gid -v $pwd/$qd:/qdata $image /bin/bash -c "constellation-node --generatekeys=/qdata/keys/tma < /dev/null > /dev/null"
     echo 'Node '$n' public key: '`cat $qd/keys/tm.pub`
 
     cp template/start-node.sh $qd/start-node.sh
@@ -205,12 +207,13 @@ networks:
       - subnet: $subnet
 EOF
 
+
 #### Create pre-populated contracts ####################################
 
-# Private contract - insert Node 2 as the recipient (streaming modification on contract file)
+# Private contract - insert Node 2 as the recipient
 cat template/deploySimplePrivateContract.js \
     | sed s:_NODEKEY_:`cat qdata_2/keys/tm.pub`:g \
           > deploySimplePrivateContract.js
 
-# Public contract
+# Public contract - no change required
 cp template/deploySimplePublicContract.js ./
