@@ -70,12 +70,10 @@ do
 
     # Generate the node's Enode and key
     enode=`docker run -u $uid:$gid -v $pwd/$qd:/qdata $image /usr/local/bin/bootnode -genkey /qdata/dd/nodekey -writeaddress < /dev/null > /dev/null`
-    nodekeyContent = `docker run -u $uid:$gid -v $pwd/$qd:/qdata $image cat /qdata/dd/nodekey`
-    enodeHash = `docker run -u $uid:$gid -v $pwd/$qd:/qdata $image /usr/local/bin/bootnode -nodekeyhex $nodekeyContent -writeaddress < /dev/null > /dev/null`
 
     # Add the enode to static-nodes.json
     sep=`[[ $n < $nnodes ]] && echo ","`
-    echo '  "enode://'$enodeHash'@'$ip':30303?discport=0"'$sep >> static-nodes.json
+    echo '  "enode://'$enode'@'$ip':30303?discport=0"'$sep >> static-nodes.json
 
     let n++
 done
